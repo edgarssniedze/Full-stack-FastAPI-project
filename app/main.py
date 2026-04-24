@@ -5,11 +5,13 @@ from app.middleware.middleware import response_log
 
 from .api.routes.auth import auth
 from .api.routes.users import users 
+from .api.routes.movies import movies
  
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(auth)
 app.include_router(users)
+app.include_router(movies)
 
 app.middleware("http")(response_log)
 

@@ -8,10 +8,8 @@ from app.models.NtoN import UserRole
 if TYPE_CHECKING:
     from app.models.user import User
 
-
 def date():
     return datetime.now(timezone.utc)
-
 
 class Role(SQLModel, table=True):
     id: UUID = Field(primary_key=True, default_factory=uuid4)

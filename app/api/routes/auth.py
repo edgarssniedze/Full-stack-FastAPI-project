@@ -7,7 +7,7 @@ from app.models.token import Token
 from app.models.user import User, UserReg, UserPublic
 from app.core.security import hash_password, verify_password, create_jwt
 
-auth = APIRouter(tags=["Authentication"])
+auth = APIRouter(tags=["Authentication"], prefix="/api")
  
 @auth.post("/register", 
            summary="Registers a new user",
