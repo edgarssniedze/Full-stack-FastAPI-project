@@ -2,10 +2,10 @@ import jwt
 from pwdlib import PasswordHash
 from jwt.exceptions import InvalidTokenError
 from datetime import datetime, timedelta, timezone
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException, Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from app.database.db import SessionDep
-from sqlmodel import select
+from sqlmodel import select, or_
 from uuid import UUID
 from app.models.user import User, UserPublic
 from dotenv import load_dotenv
@@ -23,7 +23,7 @@ expire_min = int(get_env("ACCESS_TOKEN_EXPIRE_MIN", "30"))
 secret_key = get_env("SECRET_KEY")
 algorithm = get_env("ALGORITHM", "HS256")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/login")
 password_hash = PasswordHash.recommended()
 
 def hash_password(password: str):
@@ -46,36 +46,45 @@ def create_jwt(data: dict):
     return token
 
 def decode_token(token: str):
+    print(token)
     try:
         payload = jwt.decode(token, secret_key, algorithms=[algorithm])
         return payload
-    except InvalidTokenError:
+    except Exception as e:
+        print("JWT ERROR:", e)
         raise HTTPException(status_code=401, detail="Invalid credentials")
-
-def get_current_user(session: SessionDep, token: str = Depends(oauth2_scheme)) -> UserPublic:
-    try:
-        payload = decode_token(token)
-
-        if not payload:
-            raise HTTPException(status_code=401, detail="Invalid credentials")
- 
-        userid = payload.get("sub")
-
-    except:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-
+    
+def get_user_by_id(user_id: UUID, session: SessionDep):
     user = session.exec(
-        select(User).where(User.id == UUID(userid))        
+        select(User).where(User.id == user_id)
     ).first()
     
-    if not user:    
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    return UserPublic.model_validate(user)
     
-    userdata = User(
-        id = user.id,
-        username = user.username,
-        email = user.email,
-        creation_date = user.created,
-    )
+def get_current_user(request: Request, session: SessionDep):
+    token = request.cookies.get("token")
 
-    return userdata
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing token")
+
+    try:
+        payload = decode_token(token)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid token payload")
+
+    user = get_user_by_id(user_id, session)
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+
+    return user
+
+def role_check(role: str):
+    def check(user=Depends(get_current_user)):
+        if role not in user["role"]:
+            raise HTTPException(status_code=403, detail="Insufficient permissions")
+        return user
+    return check

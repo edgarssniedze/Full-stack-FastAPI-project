@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie rental - Register</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #d4d2d2;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #efefef;    
+            padding: 25px;
+            border-radius: 20px;
+            display: inline-block;
+            width: 250px;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: none;
+            background: #cfcfcf;
+            border-radius: 5px;
+        }
+        
+        .bton{
+            padding-bottom: 15px;
+        }
+
+        .btn {
+            margin-top: 15px;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 20px;
+            background-color: #3a3a3a;
+            color: white;
+            cursor: pointer;
+        }
+
+        .register-btn {
+            margin-top: 15px;
+            width: 200px;
+        }
+
+        footer {
+            background-color: #3a3a3a;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Movie rental</h1>
+    <div class="header">
+        <nav>
+            <a href="/home">Home</a>
+            <a href="/yourmovies">Your movies</a>
+            <a href="/profile">Profile</a>
+        </nav>
+
+    </div>
+
+        <div class="card">
+
+            <li><b>username:</b> {{ user.username }}</li>
+            <li><b>Email:</b> {{ user.email }}</li>
+            <li><b>Created:</b> {{ user.created }}</li>
+            <li><b>Roles:</b> {{ user.roles }}</li>
+            {% if user.updated %}
+                <li><b>Updated:</b> {{ user.updated }}</li>
+            {% endif %}
+            <button type="reset_pass" class="btn">Reset password</button>
+            <button type="reset_email" class="btn">Reset email</button>
+
+        </div>
+
+    {% if error %}
+        <p style="color: red; margin-top: 10px;">{{ error }}</p>
+    {% endif %}
+</div>
+
+<footer>
+    <div>Made by: Edgars Sniedze</div>
+    <div>2026</div>
+</footer>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field, Relationship
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
 from typing import List, TYPE_CHECKING
@@ -34,6 +34,8 @@ class UserReg(BaseModel):
     password: str
 
 class UserPublic(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     username: str
     email: EmailStr
