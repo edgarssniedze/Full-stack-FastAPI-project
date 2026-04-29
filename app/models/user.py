@@ -1,10 +1,8 @@
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field, Relationship, text
 from pydantic import BaseModel, EmailStr, ConfigDict
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
 from typing import List, TYPE_CHECKING
-
-from app.models.NtoN import UserRole
 
 if TYPE_CHECKING:
     from app.models.role import Role
@@ -19,12 +17,11 @@ class User(SQLModel, table=True):
     username: str
     email: str = Field(index=True, unique=True)
     hashed_password: str
-
-    roles: List["Role"] = Relationship(
-        back_populates="users",
-        link_model=UserRole
+    
+    
+    role_id: UUID = Field(default=None, foreign_key="role.id",
     )
-
+    role: Role = Relationship(back_populates="users")
     created: datetime = Field(default_factory=date)
     updated: datetime | None = None
 
@@ -37,6 +34,8 @@ class UserPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
+    role_id: UUID
+    role: str
     username: str
     email: EmailStr
     created: datetime

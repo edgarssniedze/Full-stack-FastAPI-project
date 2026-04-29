@@ -18,11 +18,11 @@ class Movie(SQLModel, table=True):
 
 class MoviePublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+    id: UUID
     title: str
     description: str
     year: int
     price: Decimal
-    created: datetime
 
 class MovieCreate(BaseModel):
     title: str

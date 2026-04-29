@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends
-from sqlmodel import select
-from app.core.security import get_current_user
+from app.core.services import get_current_user
 
 users = APIRouter(tags=["User"], prefix="/api")
 

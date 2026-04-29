@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Movie rental - Profile</title>
+    <title>Movie rental - Home</title>
     <style>
         body {
             margin: 0;
@@ -26,30 +26,12 @@
         }
 
         .card {
-            background: #efefef;    
+            background: #efefef;
             padding: 25px;
             border-radius: 20px;
             display: inline-block;
-            width: 250px;
+            width: 550px;
         }
-
-        label {
-            display: block;
-            text-align: left;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-
-        input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: none;
-            background: #cfcfcf;
-            border-radius: 5px;
-        }
-        
-        .bton{ padding-bottom: 15px; }
 
         .btn {
             margin-top: 15px;
@@ -77,7 +59,7 @@
             display: flex;
             gap: 10px;
             padding: 14px 24px;
-            width: 500px;
+            width: 550px;
             margin: 0 auto 20px;
             box-sizing: border-box;
         }
@@ -90,7 +72,23 @@
 
         nav a.active { color: #fff; font-weight: bold; }
 
-        nav a.adm { color: red;}
+        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+
+        th { text-align: left; font-size: 0.85rem; color: #555; padding: 0 10px 4px; }
+
+        td { background: #cfcfcf; padding: 10px; }
+        td:first-child { border-radius: 10px 0 0 10px; }
+        td:last-child  { border-radius: 0 10px 10px 0; text-align: center; }
+
+        .btn-rent {
+            background: #3a3a3a;
+            color: #fff;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 <body>
@@ -98,48 +96,47 @@
 <div class="container">
     <h1>Movie rental</h1>
     <nav>
-        <a href="/home">Home</a>
+        <a href="/home" class="active">Home</a>
         <a href="/yourmovies">Your movies</a>
-        <a href="/profile" class="active">Profile</a>
-        {% if user.role == "admin" %}
-           <a href="/admin" class="adm">Admin</a>
-        {% endif %}
-
+        <a href="/profile">Profile</a>
+        
     </nav>
 
     <div class="card">
-        <li><b>username:</b> {{ user.username }}</li>
-        <li><b>Email:</b> {{ user.email }}</li>
-        <li><b>Created:</b> {{ user.created }}</li>
-        {% if user.role == "user" %}
-            <li><b>Roles:</b> User</li>
-        {% elif user.role == "admin" %}
-            <li><b>Roles:</b> Admin</li>
-        {% endif %}    
-        {% if user.updated %}
-            <li><b>Updated:</b> {{ user.updated }}</li>
-        {% endif %}
-        <button type="reset_pass" class="btn">Reset password</button>
-        <button type="reset_email" class="btn">Reset email</button>
-        <button onclick="logout()" class="btn">Log Out</button>
+        <p><strong>Available Movies</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Description</th>
+                    <th>In Stock</th>
+                    <th>Rent</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for movie in movies.data %}
+                <tr>
+                    <td>{{ movie.title }}</td>
+                    <td>{{ movie.price }}€</td>
+                    <td>{{ movie.description }}</td>
+                    <td>Yes</td>
+                    <td>        
+                        <form method="POST" action="/api/rent/{{ movie.id }}">
+                            <button class="btn-rent" type="submit">Rent</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-
-    {% if error %}
-        <p style="color: red; margin-top: 10px;">{{ error }}</p>
-    {% endif %}
 </div>
 
 <footer>
     <div>Made by: Edgars Sniedze</div>
     <div>2026</div>
 </footer>
-
-<script>
-    async function logout() {
-        await fetch("/api/logout", { method: "POST", credentials: "include" });
-        window.location.href = "/login";
-    }
-</script>
 
 </body>
 </html>

@@ -7,6 +7,7 @@ from app.database.db import SessionDep
 from app.models.token import Token
 from app.models.user import User, UserReg, UserPublic
 from app.core.security import hash_password, verify_password, create_jwt
+from app.core.services import get_role_by_name
 
 auth = APIRouter(tags=["Authentication"], prefix="/api")
  
@@ -36,17 +37,20 @@ def register(session: SessionDep,
     if existing_username:
         raise HTTPException(status_code=400, detail="Username already in use")
 
+    role = get_role_by_name("user", session)
+
     user = User(
         email=email,
         username=username,
         hashed_password=hash_password(password),
+        role_id=role.id,
     )
 
     session.add(user)
     session.commit()
     session.refresh(user)
 
-    return user
+    return RedirectResponse(url="/login", status_code=301)
 
 @auth.post("/login", 
             summary="Login an user into their account",
@@ -57,8 +61,6 @@ def login(session: SessionDep, response: Response, form_data: OAuth2PasswordRequ
     existing_user = session.exec(
         select(User).where(or_(User.email == form_data.username, User.username == form_data.username))
     ).first()   
-
-    existing_user.roles
     
     if not existing_user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -68,7 +70,7 @@ def login(session: SessionDep, response: Response, form_data: OAuth2PasswordRequ
 
     token = create_jwt({
         "sub": str(existing_user.id),
-        "role": [role.name for role in existing_user.roles]
+        "role": str(existing_user.role_id),
     })
     
     response = RedirectResponse(url="/profile", status_code=301)
@@ -82,3 +84,11 @@ def login(session: SessionDep, response: Response, form_data: OAuth2PasswordRequ
     )
 
     return response
+
+@auth.post("/logout")
+def logout(response: Response):
+    response.delete_cookie(
+        key="token",
+        path="/"
+    )
+    return {"message": "logged out"}

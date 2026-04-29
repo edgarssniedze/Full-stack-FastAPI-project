@@ -3,8 +3,6 @@ from typing import List, TYPE_CHECKING
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
 
-from app.models.NtoN import UserRole
-
 if TYPE_CHECKING:
     from app.models.user import User
 
@@ -15,15 +13,8 @@ class Role(SQLModel, table=True):
     id: UUID = Field(primary_key=True, default_factory=uuid4)
     name: str
     description: str
+    users: list["User"] = Relationship(back_populates="role")
 
-    created: datetime = Field(default_factory=date)
+    created: datetime | None = None
     updated: datetime | None = None
-
-    users: List["User"] = Relationship(
-        back_populates="roles",
-        link_model=UserRole
-    )
-
-from sqlmodel import SQLModel
-
-SQLModel.model_rebuild()
+    SQLModel.model_rebuild()

@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Request, Depends
+from fastapi.responses import RedirectResponse
 from app.models.user import UserPublic
-from app.core.security import get_current_user
+from app.api.routes.rent import get_rentals
+from app.core.services import get_current_user, role_check
 from fastapi.templating import Jinja2Templates
+from app.api.routes.movies import get_movies
+from datetime import timedelta
 
 views = APIRouter(tags=["Templates"])
 templates = Jinja2Templates(directory="app/templates")
@@ -46,3 +50,43 @@ def profile_page(
             "user": curr_user
         }
     )
+
+@views.get("/home")
+def home(request: Request, movies=Depends(get_movies)):
+    return templates.TemplateResponse(
+        request,
+        "home.html",
+        {"request": request,
+         "movies": movies}
+    )
+
+@views.get("/yourmovies")
+def yourmovies(request: Request, curr_user: UserPublic = Depends(get_current_user), movies=Depends(get_movies), rentals=Depends(get_rentals)):
+    return templates.TemplateResponse(
+        request,
+        "yourmovies.html",
+        context={
+            "request": request,
+            "movies": movies,
+            "rentals": rentals,
+            "user": curr_user,
+            "timedelta": timedelta
+        }
+    )
+
+@views.get("/admin")
+def admin_dash(
+    request: Request,
+    user=Depends(role_check("admin")),
+    movies=Depends(get_movies),
+):
+    return templates.TemplateResponse(
+        request=request,
+        name="admin.html",
+        context={
+            "request": request,
+            "user": user,
+            "movies": movies
+        }
+    ) 
+

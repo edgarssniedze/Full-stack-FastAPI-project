@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie rental - Admin</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #d4d2d2;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            margin-top: 80px;
+            flex: 1;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+
+        nav {
+            background-color: #3a3a3a;
+            border-radius: 20px;
+            display: flex;
+            gap: 10px;
+            padding: 14px 24px;
+            width: 500px;
+            margin: 0 auto 20px;
+            box-sizing: border-box;
+        }
+
+        nav a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        nav a.active {
+            color: red;
+            font-weight: bold;
+        }
+
+        .card {
+            background: #efefef;
+            padding: 20px;
+            border-radius: 20px;
+            width: 340px;
+            margin: 0 auto 20px;
+            text-align: left;
+        }
+
+        label {
+            font-size: 12px;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: none;
+            background: #cfcfcf;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            margin-top: 15px;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 20px;
+            background-color: #3a3a3a;
+            color: white;
+            cursor: pointer;
+        }
+
+        .movie {
+            background: #efefef;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 10px;
+            width: 340px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left;
+        }
+
+        .movie-buttons {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .small-btn {
+            flex: 1;
+            padding: 6px;
+            border: none;
+            border-radius: 10px;
+            background: #3a3a3a;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        footer {
+            background-color: #3a3a3a;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Movie Admin</h1>
+
+    <nav>
+        <a href="/home">Home</a>
+        <a href="/yourmovies">Your movies</a>
+        <a href="/profile">Profile</a>
+        {% if user.role == "admin" %}
+            <a href="/admin" class="active">Admin</a>
+        {% endif %}
+    </nav>
+
+    <div class="card">
+        <form name="creat" method="POST" action="/api/movie">
+            <label>Title</label>
+            <input type="text" name="title" required>
+
+            <label>Description</label>
+            <input type="text" name="description" required>
+
+            <label>Year</label>
+            <input type="number" name="year" required>
+
+            <label>Price</label>
+            <input type="number" step="0.01" name="price" required>
+
+            <button class="btn" type="submit">Create movie</button>
+        </form>
+    </div>
+
+    <hr style="width:340px; border: none; border-top: 1px solid #999;">
+
+    {% for movie in movies.data %}
+    <div class="movie">
+        <b>{{ movie.title }}</b>
+
+        <div class="movie-buttons">
+            <form method="POST" action="/api/delete/{{ movie.id }}" style="flex:1;">
+                <button class="small-btn">Delete</button>
+            </form>
+
+            <form method="GET" action="/api/{{ movie.id }}" style="flex:1;">
+                <button class="small-btn">Edit/Read</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+
+
+</div>
+
+<footer>
+    <div>Made by: Edgars Sniedze</div>
+    <div>2026</div>
+</footer>
+<script>
+
+</script>
+
+</body>
+</html>

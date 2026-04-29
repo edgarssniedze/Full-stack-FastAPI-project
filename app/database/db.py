@@ -2,6 +2,7 @@ from sqlmodel import Session, SQLModel, create_engine
 from contextlib import asynccontextmanager
 from typing import Annotated
 from fastapi import FastAPI, Depends
+from app.core.seed import seed_roles
 from app.models import movie, user, rental, role
 from dotenv import load_dotenv
 import os
@@ -30,5 +31,8 @@ SessionDep = Annotated[Session, Depends(get_session)]
 async def lifespan(app: FastAPI):
     create_db_and_tables()
     print("starting")
+
+    with Session(engine) as session:
+        seed_roles(session)
     yield
     print("stopping")
