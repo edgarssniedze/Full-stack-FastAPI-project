@@ -108,9 +108,9 @@
     </nav>
 
     <div class="card">
-        <li><b>username:</b> {{ user.username }}</li>
-        <li><b>Email:</b> {{ user.email }}</li>
-        <li><b>Created:</b> {{ user.created }}</li>
+        <li><b>Username:</b> {{ user.username }}</li>
+        <li><b>E-mail:</b> {{ user.email }}</li>
+        <li><b>Created at:</b> {{ user.created }}</li>
         {% if user.role == "user" %}
             <li><b>Roles:</b> User</li>
         {% elif user.role == "admin" %}

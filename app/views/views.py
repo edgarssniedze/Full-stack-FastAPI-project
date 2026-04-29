@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import RedirectResponse
 from app.models.user import UserPublic
-from app.api.routes.rent import get_rentals
+from app.api.routes.rent import get_rentals, get_rented_movie_ids
 from app.core.services import get_current_user, role_check
 from fastapi.templating import Jinja2Templates
 from app.api.routes.movies import get_movies
@@ -52,12 +52,14 @@ def profile_page(
     )
 
 @views.get("/home")
-def home(request: Request, movies=Depends(get_movies)):
+def home(request: Request, movies=Depends(get_movies), rentals=Depends(get_rentals), rented_ids=Depends(get_rented_movie_ids)):
     return templates.TemplateResponse(
         request,
         "home.html",
         {"request": request,
-         "movies": movies}
+         "movies": movies,
+         "rentals": rentals,
+         "rented_ids": rented_ids}
     )
 
 @views.get("/yourmovies")

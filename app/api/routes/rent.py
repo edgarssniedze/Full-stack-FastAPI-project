@@ -6,7 +6,7 @@ from app.database.db import SessionDep
 from app.models.rental import Rental, RentalsPublic, RentalMovie
 from app.models.movie import Movie
 from uuid import UUID
-from app.core.services import role_check
+from app.core.services import role_check, get_current_user
 from datetime import datetime
 
 rent = APIRouter(tags=["Rentals"], prefix="/api")
@@ -16,9 +16,8 @@ async def rent_movie(
     *,
     session: SessionDep,
     movie_id: UUID,
-    role=Depends(role_check("admin"))
+    user=Depends(get_current_user)
 ):
-    user = role
 
     movie = session.get(Movie, movie_id)
     if not movie:
@@ -41,9 +40,9 @@ async def rent_movie(
         "/rentals",
         summary="Lists all the rentals",
         description="Lists all rentals and their details",
-        response_description="Returns every rental and their details",
+        response_description="Returns every rental and their details"
         )
-async def get_rentals(*, session: SessionDep):
+async def get_rentals(*, session: SessionDep, user=Depends(get_current_user)):
     count = session.exec(
         select(func.count()).select_from(Rental)
     ).one()
@@ -51,6 +50,7 @@ async def get_rentals(*, session: SessionDep):
     results = session.exec(
         select(Rental, Movie)
         .join(Movie, Rental.movie_id == Movie.id)
+        .where(Rental.user_id == user.id)
         .order_by(Rental.created.desc())
     ).all()
 
@@ -64,3 +64,28 @@ async def get_rentals(*, session: SessionDep):
     ],
     count=count
 )
+
+@rent.post("/rent/return/{rental_id}")
+async def return_movie(session: SessionDep, rental_id: UUID):
+    rental = session.get(Rental, rental_id)
+
+    if not rental:
+        raise HTTPException(404, detail="Rental not found")
+    
+    rental.returned_at = datetime.now()
+
+    session.delete(rental)
+    session.commit()
+
+    return RedirectResponse("/yourmovies", status_code=303)
+
+
+def get_rented_movie_ids(session: SessionDep) -> set[UUID]:
+    result = session.exec(
+        select(Rental.movie_id)
+        .where(Rental.returned_at == None)
+    ).all()
+
+    results = set(result)
+
+    return results

@@ -120,11 +120,19 @@
                     <td>{{ movie.title }}</td>
                     <td>{{ movie.price }}€</td>
                     <td>{{ movie.description }}</td>
-                    <td>Yes</td>
-                    <td>        
+                    <td>
+                        {% if movie.id in rented_ids %}
+                            No
+                        {% else %}
+                            Yes
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if movie.id not in rented_ids %}
                         <form method="POST" action="/api/rent/{{ movie.id }}">
                             <button class="btn-rent" type="submit">Rent</button>
                         </form>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
