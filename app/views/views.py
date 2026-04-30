@@ -92,3 +92,19 @@ def admin_dash(
         }
     ) 
 
+@views.get("/passwordreset")
+async def password_reset_page(request: Request, token: str):
+    return templates.TemplateResponse(request, 
+        name="passwordreset.html", 
+        context={"request": request,
+        "token": token
+    })
+
+@views.get("/emailreset")
+async def email_reset_page(request: Request, token: str):
+    return templates.TemplateResponse(request, 
+        name="emailreset.html", 
+        context={"request": request,
+        "token": token
+    })
+

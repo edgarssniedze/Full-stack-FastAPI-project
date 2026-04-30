@@ -29,14 +29,26 @@
             background: #efefef;    
             padding: 25px;
             border-radius: 20px;
-            display: inline-block;
-            width: 250px;
+            display: flex;
+            flex-direction: row;    
+            width: 500px;
+            margin: 0 auto;
+            align-items: center;  
+            gap: 20px;
+        }
+
+        .cardleft {
+            flex: 0 0 150px;
+        }
+
+        .cardright {
+            flex: 1;                 
         }
 
         label {
             display: block;
             text-align: left;
-            font-size: 12px;
+            font-size: 18px;
             margin-top: 10px;
         }
 
@@ -51,15 +63,9 @@
         
         .bton{ padding-bottom: 15px; }
 
-        .btn {
-            margin-top: 15px;
-            padding: 10px;
-            width: 100%;
-            border: none;
-            border-radius: 20px;
-            background-color: #3a3a3a;
-            color: white;
-            cursor: pointer;
+        img{
+            width:200px;
+            height:200px;
         }
 
         footer {
@@ -70,7 +76,7 @@
             padding: 15px;
             font-size: 12px;
         }
-
+        
         nav {
             background-color: #3a3a3a;
             border-radius: 20px;
@@ -91,6 +97,49 @@
         nav a.active { color: #fff; font-weight: bold; }
 
         nav a.adm { color: red;}
+
+        button {
+        height: 50px;
+        margin: 5px;
+        width: 120px;
+        background: #333;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        cursor: pointer;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        font-family: 'Courier New', Courier, monospace;
+        border: solid #404c5d 1px;
+        font-size: 16px;
+        color: rgb(161, 161, 161);
+        -webkit-transition: 500ms;
+        transition: 500ms;
+        border-radius: 5px;
+        background: linear-gradient(145deg, #2e2d2d, #212121);
+        -webkit-box-shadow: -1px -5px 15px #41465b, 5px 5px 15px #41465b,
+            inset 5px 5px 10px #212121, inset -5px -5px 10px #212121;
+        box-shadow: -1px -2px 6px #41465b, 2px 2px 6px #41465b,
+            inset 2px 2px 5px #212121, inset -2px -2px 5px #212121;        
+        }
+
+        button:hover {
+        -webkit-box-shadow: 1px 1px 13px #20232e, -1px -1px 13px #545b78;
+        box-shadow: 1px 1px 13px #20232e, -1px -1px 13px #545b78;
+        color: #d6d6d6;
+        -webkit-transition: 500ms;
+        transition: 500ms;
+        }
+
+        button:active {
+        -webkit-box-shadow: 1px 1px 13px #20232e, -1px -1px 33px #545b78;
+        box-shadow: 1px 1px 13px #20232e, -1px -1px 33px #545b78;
+        color: #d6d6d6;
+        -webkit-transition: 100ms;
+        transition: 100ms;
+        }
+
     </style>
 </head>
 <body>
@@ -108,25 +157,38 @@
     </nav>
 
     <div class="card">
-        <li><b>Username:</b> {{ user.username }}</li>
-        <li><b>E-mail:</b> {{ user.email }}</li>
-        <li><b>Created at:</b> {{ user.created }}</li>
+        <div class="cardleft">       
+            <img src="https://picsum.photos/id/237/400/300" alt="Specific placeholder">
+        </div>
+        <div class="cardright">
+        <label><b>Username:</b> {{ user.username }}</label>
+        <label><b>E-mail:</b> {{ user.email }}</label>
+        <label><b>Created at:</b> {{ user.created }}</label>
         {% if user.role == "user" %}
-            <li><b>Roles:</b> User</li>
+            <label><b>Roles:</b> User</label>
         {% elif user.role == "admin" %}
-            <li><b>Roles:</b> Admin</li>
+            <label><b>Roles:</b> Admin</label>
         {% endif %}    
         {% if user.updated %}
-            <li><b>Updated:</b> {{ user.updated }}</li>
+            <label><b>Updated:</b> {{ user.updated }}</label>
         {% endif %}
-        <button type="reset_pass" class="btn">Reset password</button>
-        <button type="reset_email" class="btn">Reset email</button>
+        </div>
+    </div>
+    <div style="display:flex; justify-content:center; gap:10px; margin-top:20px;">
+    
+        <form method="post" action="/help/changepassword/">
+            <button type="submit" class="btn" onclick="password()">Reset password</button>
+        </form>
+
+        <form method="post" action="/help/changeemail/">
+            <button type="submit" class="btn" onclick="email()">Reset Email</button>
+        </form>
+
         <button onclick="logout()" class="btn">Log Out</button>
     </div>
-
     {% if error %}
         <p style="color: red; margin-top: 10px;">{{ error }}</p>
-    {% endif %}
+    {% endif %} 
 </div>
 
 <footer>
@@ -138,6 +200,14 @@
     async function logout() {
         await fetch("/api/logout", { method: "POST", credentials: "include" });
         window.location.href = "/login";
+    }
+
+    async function password(){
+        alert('A password reset link has been sent')
+    }
+
+    async function email(){
+        alert('A email change link has been sent')
     }
 </script>
 

@@ -10,6 +10,7 @@ from .api.routes.users import users
 from .api.routes.movies import movies
 from  .views.views import views
 from .api.routes.rent import rent
+from .api.routes.password import reset
 
 app = FastAPI(lifespan=lifespan)
 
@@ -18,6 +19,7 @@ app.include_router(users)
 app.include_router(movies)
 app.include_router(views)
 app.include_router(rent)
+app.include_router(reset)
 
 app.middleware("http")(response_log)
 app.add_middleware(AuthMiddleware)
